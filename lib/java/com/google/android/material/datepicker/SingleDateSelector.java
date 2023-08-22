@@ -88,6 +88,11 @@ public class SingleDateSelector implements DateSelector<Long> {
   }
 
   @Override
+  public void clearRangeSelection() {
+
+  }
+
+  @Override
   @Nullable
   public Long getSelection() {
     return selectedItem;

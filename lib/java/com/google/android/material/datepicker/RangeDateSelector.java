@@ -121,6 +121,12 @@ public class RangeDateSelector implements DateSelector<Pair<Long, Long>> {
   }
 
   @Override
+  public void clearRangeSelection() {
+    selectedStartItem = null;
+    selectedEndItem = null;
+  }
+
+  @Override
   public int getDefaultThemeResId(@NonNull Context context) {
     Resources res = context.getResources();
     DisplayMetrics display = res.getDisplayMetrics();

@@ -80,6 +80,8 @@ public interface DateSelector<S> extends Parcelable {
   @NonNull
   Collection<Long> getSelectedDays();
 
+  void clearRangeSelection();
+
   /**
    * Returns a list of ranges whose time values represent ranges that should be filled.
    *

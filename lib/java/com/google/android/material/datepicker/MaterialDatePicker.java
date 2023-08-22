@@ -84,11 +84,14 @@ public final class MaterialDatePicker<S> extends DialogFragment {
   private static final String TITLE_TEXT_KEY = "TITLE_TEXT_KEY";
   private static final String POSITIVE_BUTTON_TEXT_RES_ID_KEY = "POSITIVE_BUTTON_TEXT_RES_ID_KEY";
   private static final String POSITIVE_BUTTON_TEXT_KEY = "POSITIVE_BUTTON_TEXT_KEY";
+  private static final String CLEAR_BUTTON_TEXT_RES_ID_KEY = "CLEAR_BUTTON_TEXT_RES_ID_KEY";
+  private static final String CLEAR_BUTTON_TEXT_KEY = "CLEAR_BUTTON_TEXT_KEY";
   private static final String NEGATIVE_BUTTON_TEXT_RES_ID_KEY = "NEGATIVE_BUTTON_TEXT_RES_ID_KEY";
   private static final String NEGATIVE_BUTTON_TEXT_KEY = "NEGATIVE_BUTTON_TEXT_KEY";
   private static final String INPUT_MODE_KEY = "INPUT_MODE_KEY";
 
   static final Object CONFIRM_BUTTON_TAG = "CONFIRM_BUTTON_TAG";
+  static final Object CLEAR_BUTTON_TAG = "CLEAR_BUTTON_TAG";
   static final Object CANCEL_BUTTON_TAG = "CANCEL_BUTTON_TAG";
   static final Object TOGGLE_BUTTON_TAG = "TOGGLE_BUTTON_TAG";
 
@@ -133,6 +136,8 @@ public final class MaterialDatePicker<S> extends DialogFragment {
       new LinkedHashSet<>();
   private final LinkedHashSet<DialogInterface.OnDismissListener> onDismissListeners =
       new LinkedHashSet<>();
+  private final LinkedHashSet<MaterialPickerOnClearButtonClickListener<? super S>>
+      onClearButtonClickListeners = new LinkedHashSet<>();
 
   @StyleRes private int overrideThemeResId;
   @Nullable private DateSelector<S> dateSelector;
@@ -146,6 +151,8 @@ public final class MaterialDatePicker<S> extends DialogFragment {
   @InputMode private int inputMode;
   @StringRes private int positiveButtonTextResId;
   private CharSequence positiveButtonText;
+  @StringRes private int clearButtonTextResId;
+  private CharSequence clearButtonText;
   @StringRes private int negativeButtonTextResId;
   private CharSequence negativeButtonText;
 
@@ -154,6 +161,7 @@ public final class MaterialDatePicker<S> extends DialogFragment {
   private CheckableImageButton headerToggleButton;
   @Nullable private MaterialShapeDrawable background;
   private Button confirmButton;
+  private Button clearButton;
 
   private boolean edgeToEdgeEnabled;
   @Nullable private CharSequence fullTitleText;
@@ -172,6 +180,8 @@ public final class MaterialDatePicker<S> extends DialogFragment {
     args.putInt(INPUT_MODE_KEY, options.inputMode);
     args.putInt(POSITIVE_BUTTON_TEXT_RES_ID_KEY, options.positiveButtonTextResId);
     args.putCharSequence(POSITIVE_BUTTON_TEXT_KEY, options.positiveButtonText);
+    args.putInt(CLEAR_BUTTON_TEXT_RES_ID_KEY, options.clearButtonTextResId);
+    args.putCharSequence(CLEAR_BUTTON_TEXT_KEY, options.clearButtonText);
     args.putInt(NEGATIVE_BUTTON_TEXT_RES_ID_KEY, options.negativeButtonTextResId);
     args.putCharSequence(NEGATIVE_BUTTON_TEXT_KEY, options.negativeButtonText);
     materialDatePickerDialogFragment.setArguments(args);
@@ -311,6 +321,23 @@ public final class MaterialDatePicker<S> extends DialogFragment {
               listener.onPositiveButtonClick(getSelection());
             }
             dismiss();
+          }
+        });
+    clearButton = root.findViewById(R.id.clear_button);
+    clearButton.setTag(CLEAR_BUTTON_TAG);
+    if (clearButtonText != null) {
+      clearButton.setText(clearButtonText);
+    } else if (clearButtonTextResId != 0) {
+      clearButton.setText(clearButtonTextResId);
+    }
+    clearButton.setOnClickListener(
+        new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            for (MaterialPickerOnClearButtonClickListener<? super S> listener :
+                onClearButtonClickListeners) {
+              listener.onClearButtonClick(getSelection());
+            }
           }
         });
 
@@ -576,6 +603,28 @@ public final class MaterialDatePicker<S> extends DialogFragment {
 
   /**
    * Removes a listener previously added via {@link
+   * MaterialDatePicker#addOnClearButtonClickListener}.
+   */
+  public boolean removeOnClearButtonClickListener(
+      MaterialPickerOnClearButtonClickListener<? super S> onClearButtonClickListener) {
+    return onClearButtonClickListeners.remove(onClearButtonClickListener);
+  }
+
+  /**
+   * Removes all listeners added via {@link MaterialDatePicker#addOnClearButtonClickListener}.
+   */
+  public void clearOnClearButtonClickListeners() {
+    onClearButtonClickListeners.clear();
+  }
+
+  /** The supplied listener is called when the user clears the selection. */
+  public boolean addOnClearButtonClickListener(
+      MaterialPickerOnClearButtonClickListener<? super S> onClearButtonClickListener) {
+    return onClearButtonClickListeners.add(onClearButtonClickListener);
+  }
+
+  /**
+   * Removes a listener previously added via {@link
    * MaterialDatePicker#addOnPositiveButtonClickListener}.
    */
   public boolean removeOnPositiveButtonClickListener(
@@ -662,6 +711,8 @@ public final class MaterialDatePicker<S> extends DialogFragment {
     CharSequence titleText = null;
     int positiveButtonTextResId = 0;
     CharSequence positiveButtonText = null;
+    int clearButtonTextResId = 0;
+    CharSequence clearButtonText = null;
     int negativeButtonTextResId = 0;
     CharSequence negativeButtonText = null;
     @Nullable S selection = null;
@@ -779,6 +830,32 @@ public final class MaterialDatePicker<S> extends DialogFragment {
     @NonNull
     @CanIgnoreReturnValue
     public Builder<S> setPositiveButtonText(@StringRes int textId) {
+      this.positiveButtonTextResId = textId;
+      this.positiveButtonText = null;
+      return this;
+    }
+
+    /**
+     * Sets the text used in the positive button
+     *
+     * @param text text used in the positive button
+     */
+    @NonNull
+    @CanIgnoreReturnValue
+    public Builder<S> setClearButtonText(@Nullable CharSequence text) {
+      this.positiveButtonText = text;
+      this.positiveButtonTextResId = 0;
+      return this;
+    }
+
+    /**
+     * Sets the text used in the positive button
+     *
+     * @param textId resource id to be used as text in the positive button
+     */
+    @NonNull
+    @CanIgnoreReturnValue
+    public Builder<S> setClearButtonText(@StringRes int textId) {
       this.positiveButtonTextResId = textId;
       this.positiveButtonText = null;
       return this;

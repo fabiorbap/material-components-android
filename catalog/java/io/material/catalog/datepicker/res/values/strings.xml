@@ -30,6 +30,8 @@
   <string name="cat_picker_cancel">The picker was cancelled.</string>
   <!-- Informs that the user action is being awaited [CHAR LIMIT=120] -->
   <string name="cat_picker_no_action">Awaiting user action.</string>
+  <!-- Informs that the user clicked the clear button [CHAR LIMIT=120]-->
+  <string name="cat_picker_clear">The user clicked the clear button.</string>
 
   <!-- Grouping label for a set of radio buttons that choose the selection mode [CHAR LIMIT=45] -->
   <string name="cat_picker_date_selector">Selection Mode</string>
